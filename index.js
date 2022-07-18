@@ -24,7 +24,7 @@ setInterval(() => {
   }
   let rpsrn = file.length - start;
   rps.push(rpsrn);
-  if (rps.length > 5) {
+  if (rps.length > 10) {
     rps.shift();
     avg = calcAvg(rps);
     if (avg > maxAvgRps || rpsrn > maxRps)
@@ -86,7 +86,7 @@ async function underAttack(r, a) {
   })
 }
 function attackEnd(r, a) {
-  if (!ua || Date.now() - uafrom < 10000) return;
+  if (!ua || Date.now() - uafrom < 20000) return;
   const chart = new QuickChart();
   chart.setBackgroundColor("#2f3136")
   chart.setConfig({
