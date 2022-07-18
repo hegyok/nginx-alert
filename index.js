@@ -85,7 +85,7 @@ async function underAttack(r, a) {
     }
   })
 }
-function attackEnd(r, a) {
+async function attackEnd(r, a) {
   if (!ua || Date.now() - uafrom < 20000) return;
   const chart = new QuickChart();
   chart.setBackgroundColor("#2f3136")
@@ -113,7 +113,7 @@ function attackEnd(r, a) {
           "timestamp": "",
           "author": {},
           "image": {
-            "url": chart.getUrl()
+            "url": await chart.getShortUrl()
           },
           "thumbnail": {},
           "footer": {
