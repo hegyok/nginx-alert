@@ -35,15 +35,15 @@ setInterval(() => {
   if (rps.length > 10) {
     rps.shift();
     avg = calcAvg(rps);
-    if (avg > maxAvgRps || rpsrn > maxRps){
-      underAttackCf = Date.now() + 60000*3;
-      if(!underAttackCfEnabled){
+    if (avg > maxAvgRps || rpsrn > maxRps) {
+      underAttackCf = Date.now() + 60000 * 3;
+      if (!underAttackCfEnabled) {
         underAttackCfEnabled = true;
         enableUam();
       }
       underAttack(rpsrn, avg);
-    }else{
-      if(underAttackCfEnabled && Date.now() > underAttackCf){
+    } else {
+      if (underAttackCfEnabled && Date.now() > underAttackCf) {
         underAttackCfEnabled = false;
         disableUam();
       }
@@ -53,7 +53,7 @@ setInterval(() => {
   start = file.length;
 }, 1000)
 async function underAttack(r, a) {
-  if(ua){
+  if (ua) {
     uafrom = Date.now();
   }
   uagraph.push(r);
@@ -61,7 +61,7 @@ async function underAttack(r, a) {
   if (ua) return;
   ua = true;
   uafrom = Date.now();
-  if(Date.now() - lastAttack < 60000) return;
+  if (Date.now() - lastAttack < 60000) return;
   const chart = new QuickChart();
   chart.setBackgroundColor("#2f3136")
   chart.setConfig({
@@ -106,48 +106,50 @@ async function underAttack(r, a) {
 }
 async function attackEnd(r, a) {
   if (!ua || Date.now() - uafrom < 20000) return;
-  const chart = new QuickChart();
-  lastAttack = Date.now();
-  chart.setBackgroundColor("#2f3136")
-  chart.setConfig({
-    type: 'line',
-    data: {
-      labels: new Array(uagraph.length).fill(''),
-      datasets: [
-        {
-          label: 'Current',
-          data: uagraph
-        }
-      ]
-    }
-  })
-  request(discordWebhook, {
-    method: 'POST',
-    body: JSON.stringify({
-      "username": "DDoS Sensor",
-      "embeds": [
-        {
-          "title": "DDoS Attack has been mitigated",
-          "color": 16711680,
-          "description": `Average: ${calcAvg(uagraph)}r/s\nCurrent: ${r}r/s\nMax: ${maxuarps}r/s\n`,
-          "timestamp": "",
-          "author": {},
-          "image": {
-            "url": await chart.getShortUrl()
-          },
-          "thumbnail": {},
-          "footer": {
-            "text": ``
-          },
-          "fields": []
-        }
-      ],
-      "components": []
-    }),
-    headers: {
-      'content-type': 'application/json'
-    }
-  })
+  if (Date.now() - lastAttack > 60000) {
+    const chart = new QuickChart();
+    lastAttack = Date.now();
+    chart.setBackgroundColor("#2f3136")
+    chart.setConfig({
+      type: 'line',
+      data: {
+        labels: new Array(uagraph.length).fill(''),
+        datasets: [
+          {
+            label: 'Current',
+            data: uagraph
+          }
+        ]
+      }
+    })
+    request(discordWebhook, {
+      method: 'POST',
+      body: JSON.stringify({
+        "username": "DDoS Sensor",
+        "embeds": [
+          {
+            "title": "DDoS Attack has been mitigated",
+            "color": 16711680,
+            "description": `Average: ${calcAvg(uagraph)}r/s\nCurrent: ${r}r/s\nMax: ${maxuarps}r/s\n`,
+            "timestamp": "",
+            "author": {},
+            "image": {
+              "url": await chart.getShortUrl()
+            },
+            "thumbnail": {},
+            "footer": {
+              "text": ``
+            },
+            "fields": []
+          }
+        ],
+        "components": []
+      }),
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+  }
   uafrom = 0;
   uagraph = [];
   ua = false;
@@ -166,7 +168,7 @@ function calcAvg(array) {
 }
 
 
-function enableUam(){
+function enableUam() {
   request(`https://api.cloudflare.com/client/v4/zones/${cfZoneId}/settings/security_level`, {
     method: "PATCH",
     headers: {
@@ -180,7 +182,7 @@ function enableUam(){
   })
 }
 
-function disableUam(){
+function disableUam() {
   request(`https://api.cloudflare.com/client/v4/zones/${cfZoneId}/settings/security_level`, {
     method: "PATCH",
     headers: {
