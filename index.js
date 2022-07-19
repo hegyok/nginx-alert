@@ -2,11 +2,16 @@ const fs = require('fs');
 const QuickChart = require('quickchart-js');
 const { request } = require('undici')
 
+//detection settings
 const path = `/var/log/nginx/access.log`;
 const maxAvgRps = 10;
 const maxRps = 20;
 const discordWebhook = "";
 
+//cloudflare settings
+const cfEmail = "";
+const cfApiKey = "";
+const cfZoneId = "";
 
 
 let ua = false;
@@ -16,6 +21,8 @@ let uagraph = [];
 let rps = [];
 let start = null;
 let avg = 0;
+let underAttackCf = 0;
+let underAttackCfEnabled = false;
 setInterval(() => {
   const file = fs.readFileSync(path, 'utf-8').split('\n');
   if (!start) {
@@ -27,10 +34,20 @@ setInterval(() => {
   if (rps.length > 10) {
     rps.shift();
     avg = calcAvg(rps);
-    if (avg > maxAvgRps || rpsrn > maxRps)
+    if (avg > maxAvgRps || rpsrn > maxRps){
+      underAttackCf = Date.now() + 60000*3;
+      if(!underAttackCfEnabled){
+        underAttackCfEnabled = true;
+        enableUam();
+      }
       underAttack(rpsrn, avg);
-    else
+    }else{
+      if(underAttackCfEnabled && Date.now() > underAttackCf){
+        underAttackCfEnabled = false;
+        disableUam();
+      }
       attackEnd(rpsrn, avg);
+    }
   }
   start = file.length;
 }, 1000)
@@ -107,7 +124,7 @@ async function attackEnd(r, a) {
       "username": "DDoS Sensor",
       "embeds": [
         {
-          "title": "DDoS Attack has stopped",
+          "title": "DDoS Attack has been mitigated",
           "color": 16711680,
           "description": `Average: ${calcAvg(uagraph)}r/s\nCurrent: ${r}r/s\nMax: ${maxuarps}r/s\n`,
           "timestamp": "",
@@ -143,4 +160,33 @@ function calcAvg(array) {
   });
 
   return Math.floor(total / count);
+}
+
+
+function enableUam(){
+  request(`https://api.cloudflare.com/client/v4/zones/${cfZoneId}/settings/security_level`, {
+    method: "PATCH",
+    headers: {
+      'X-Auth-Email': cfEmail,
+      "X-Auth-Key": cfApiKey,
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      value: "under_attack"
+    })
+  })
+}
+
+function disableUam(){
+  request(`https://api.cloudflare.com/client/v4/zones/${cfZoneId}/settings/security_level`, {
+    method: "PATCH",
+    headers: {
+      'X-Auth-Email': cfEmail,
+      "X-Auth-Key": cfApiKey,
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      value: "high"
+    })
+  })
 }
