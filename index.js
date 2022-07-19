@@ -106,7 +106,7 @@ async function underAttack(r, a) {
 }
 async function attackEnd(r, a) {
   if (!ua || Date.now() - uafrom < 20000) return;
-  if (Date.now() - lastAttack > 60000) {
+  if (Date.now() - lastAttack > 60000*5) {
     const chart = new QuickChart();
     lastAttack = Date.now();
     chart.setBackgroundColor("#2f3136")
