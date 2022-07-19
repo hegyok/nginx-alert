@@ -23,6 +23,7 @@ let start = null;
 let avg = 0;
 let underAttackCf = 0;
 let underAttackCfEnabled = false;
+let lastAttack = 0;
 setInterval(() => {
   const file = fs.readFileSync(path, 'utf-8').split('\n');
   if (!start) {
@@ -60,6 +61,7 @@ async function underAttack(r, a) {
   if (ua) return;
   ua = true;
   uafrom = Date.now();
+  if(Date.now() - lastAttack < 60000) return;
   const chart = new QuickChart();
   chart.setBackgroundColor("#2f3136")
   chart.setConfig({
@@ -105,6 +107,7 @@ async function underAttack(r, a) {
 async function attackEnd(r, a) {
   if (!ua || Date.now() - uafrom < 20000) return;
   const chart = new QuickChart();
+  lastAttack = Date.now();
   chart.setBackgroundColor("#2f3136")
   chart.setConfig({
     type: 'line',
