@@ -70,7 +70,7 @@ async function underAttack(r, a) {
       labels: new Array(rps.length).fill(''),
       datasets: [
         {
-          label: 'Current',
+          label: 'Current RPS',
           data: rps
         }
       ]
@@ -116,7 +116,7 @@ async function attackEnd(r, a) {
         labels: new Array(uagraph.length).fill(''),
         datasets: [
           {
-            label: 'Current',
+            label: 'Current RPS',
             data: uagraph
           }
         ]
