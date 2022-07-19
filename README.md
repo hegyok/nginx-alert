@@ -1,11 +1,11 @@
 # DDoS Alerter
-- This code was programmed by **Hegy#0420**, I just redesigned it to support Discord Bot!
+- This code was written by **Hegy#0420**, I just redesigned it to support a Discord Bot!
 
 ## Instructions:
 - Download all files
 - Rename `template.env` to `.env`
-- Put the TOKEN of your Discord bot in the `.env`
-- In config.json changes things that are required
+- Put the TOKEN of your Discord bot into `.env`
+- In config.json change things that are required
 
 That's it, then just use `node .`
 
