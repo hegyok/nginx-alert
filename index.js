@@ -5,7 +5,7 @@ const { request } = require('undici')
 //detection settings
 const path = `/var/log/nginx/access.log`;
 const maxAvgRps = 10;
-const maxRps = 20;
+const maxRps = 20; 
 const discordWebhook = "";
 
 //cloudflare settings
